@@ -1,0 +1,93 @@
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras import layers
+
+import matplotlib.pyplot as plt
+import app
+
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras import layers
+
+import matplotlib.pyplot as plt
+import app
+
+import numpy as np
+import pandas  as pd
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, MaxPool2D, Flatten, Conv2D, Dropout, Input
+import os
+from matplotlib.image import imread
+
+
+
+gen = ImageDataGenerator(rotation_range=20,width_shift_range=0.1,
+                          height_shift_range=0.1,
+                          shear_range=0.1,
+                          zoom_range=0.1,
+                          horizontal_flip=True,
+                          fill_mode='nearest')
+      
+batch_size = 16
+train_img_gen = gen.flow_from_directory("augmented-data/train",batch_size = batch_size,color_mode='grayscale', class_mode='sparse')
+test_img_gen = gen.flow_from_directory("augmented-data/test",batch_size = batch_size,color_mode='grayscale', class_mode='sparse')
+
+data_dir = 'augmented-data'
+train_path = data_dir+'/train/'
+print(train_path)
+
+print(os.listdir(train_path))
+print(os.listdir(train_path+'Covid')[0])
+covid_xray = train_path+'Covid'+'/231.png'
+print(covid_xray)
+plt.imshow(imread(covid_xray))
+print(imread(covid_xray).shape)
+batch_size = 4
+input_img = (4, 256, 256, 4)
+# create model
+model = Sequential()
+model.add(Input(shape=train_img_gen.image_shape))
+model.add(Conv2D(4, 3, activation='relu',))
+model.add(MaxPool2D(pool_size=(2,2)))
+model.add(Dropout(0.5))
+model.add(Flatten())
+model.add(Dense(3, activation='softmax'))
+
+# Compile model
+model.compile(loss='sparse_categorical_crossentropy',
+optimizer='adam',
+metrics=['accuracy'])
+
+print(model.summary())
+from tensorflow.keras.callbacks import EarlyStopping
+
+early_stop = EarlyStopping(monitor='accuracy',patience=2)
+# fit model
+model.fit(train_img_gen, epochs=1500,
+validation_data=test_img_gen, callbacks=[early_stop])
+
+print(model.metrics_names)
+
+
+
+
+# Do Matplotlib extension below
+
+# use this savefig call at the end of your graph instead of using plt.show()
+# plt.savefig('static/images/my_plots.png')
+
+
+
+# Do Matplotlib extension below
+
+# use this savefig call at the end of your graph instead of using plt.show()
+# plt.savefig('static/images/my_plots.png')
+
